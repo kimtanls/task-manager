@@ -23,7 +23,7 @@ public class AdminController {
 
     @PostMapping("/task")
     public ResponseEntity<TaskDto> createTask(@RequestBody TaskDto taskDto){
-        TaskDto createTaskDto = adminService.createTask(new TaskDto());
+        TaskDto createTaskDto = adminService.createTask(taskDto);
         if (createTaskDto == null) return  ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         return  ResponseEntity.status(HttpStatus.CREATED).body(createTaskDto);
     }

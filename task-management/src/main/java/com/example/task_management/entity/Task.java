@@ -22,6 +22,7 @@ public class Task {
     private Date dueDate;
     private TaskStatus taskStatus;
     private String priority;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE) //khi user bi xoa thi ban ghi o day cung bi xoa

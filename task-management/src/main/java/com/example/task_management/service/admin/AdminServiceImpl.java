@@ -8,13 +8,14 @@ import com.example.task_management.enums.TaskStatus;
 import com.example.task_management.enums.UserRole;
 import com.example.task_management.repository.TaskRepository;
 import com.example.task_management.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
+@Slf4j
 @Service
 public class AdminServiceImpl implements  AdminService{
     @Autowired
@@ -34,7 +35,11 @@ public class AdminServiceImpl implements  AdminService{
 
     @Override
     public TaskDto createTask(TaskDto taskDto) {
-        Optional<User> optionalUser = userRepository.findById(taskDto.getId());
+        if (taskDto.getEmployeeId() == null) {
+            throw new IllegalArgumentException("Employee ID must not be null");
+        }
+        Optional<User> optionalUser = userRepository.findById(taskDto.getEmployeeId());
+        log.info(String.valueOf(taskDto.getEmployeeId()));
         if (optionalUser.isPresent()){
             Task task = new Task();
             task.setTitle(taskDto.getTitle());
@@ -43,7 +48,7 @@ public class AdminServiceImpl implements  AdminService{
             task.setDueDate(taskDto.getDueDate());
             task.setTaskStatus(TaskStatus.INPROGRESS);
             task.setUser(optionalUser.get());
-            taskRepository.save(task).getTaskDTO();
+            return taskRepository.save(task).getTaskDTO();
         }
         return null;
     }
