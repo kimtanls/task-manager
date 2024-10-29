@@ -3,10 +3,10 @@ package com.example.task_management.controller.admin;
 import com.example.task_management.dto.TaskDto;
 import com.example.task_management.service.admin.AdminService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -27,4 +27,10 @@ public class AdminController {
         if (createTaskDto == null) return  ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         return  ResponseEntity.status(HttpStatus.CREATED).body(createTaskDto);
     }
+
+    @GetMapping("/tasks")
+    public ResponseEntity<?> getAllTasks(){
+        return ResponseEntity.ok(adminService.getAllTasks());
+    }
+
 }

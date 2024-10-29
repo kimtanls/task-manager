@@ -9,4 +9,6 @@ public interface AdminService {
     List<UserDto> getUsers();
 
     TaskDto createTask(TaskDto taskDto);
+
+    List<TaskDto> getAllTasks();
 }

@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -51,5 +52,15 @@ public class AdminServiceImpl implements  AdminService{
             return taskRepository.save(task).getTaskDTO();
         }
         return null;
+    }
+
+    @Override
+    public List<TaskDto> getAllTasks() {
+
+        return taskRepository.findAll()
+                .stream()
+                .sorted(Comparator.comparing(Task::getDueDate).reversed())
+                .map(Task::getTaskDTO)
+                .collect(Collectors.toList());
     }
 }
