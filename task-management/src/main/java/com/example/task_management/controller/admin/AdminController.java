@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -33,4 +35,24 @@ public class AdminController {
         return ResponseEntity.ok(adminService.getAllTasks());
     }
 
+    @DeleteMapping("/task/{id}")
+    public ResponseEntity<Void> deleteTask(@PathVariable Long id){
+        adminService.deleteTask(id);
+        return ResponseEntity.ok(null);
+    }
+    @GetMapping("/task/{id}")
+    public  ResponseEntity<TaskDto> getTaskById(@PathVariable Long id){
+        return ResponseEntity.ok(adminService.getTaskById(id));
+    }
+    @PutMapping("/task/{id}")
+    public ResponseEntity<?> updateTask(@PathVariable Long id, @RequestBody TaskDto taskDto){
+        TaskDto updateTask = adminService.updateTask(id,taskDto);
+        if (updateTask == null) return ResponseEntity.notFound().build();
+        return  ResponseEntity.ok(updateTask);
+    }
+
+    @GetMapping("/task/search/{title}")
+    public ResponseEntity<List<TaskDto>> searchTask(@PathVariable String title){
+        return ResponseEntity.ok(adminService.searchTaskByTitle(title));
+    }
 }

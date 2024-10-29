@@ -1,10 +1,17 @@
 package com.example.task_management.utils;
 
+import com.example.task_management.entity.User;
+import com.example.task_management.enums.UserRole;
+import com.example.task_management.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -13,10 +20,15 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 
 @Component
+@RequiredArgsConstructor
 public class JwtUtil {
+
+    @Autowired
+    private UserRepository userRepository;
     public String generateToken(UserDetails userDetails){
         return  generateToken(new HashMap<>(), userDetails);
     }
@@ -61,4 +73,19 @@ public class JwtUtil {
     private Date extractExpiration(String token) { //trích xuất thời gian hết hạn của token từ các claims.
         return extractClaim(token, Claims::getExpiration);
     }
+
+    public User getLoggedInUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            User user = (User) authentication.getPrincipal();
+            System.out.println("User found: " + user.getId());
+            Optional<User> optionalUser = userRepository.findById(user.getId());
+            return optionalUser.orElse(null);
+        }
+        System.out.println("No authenticated user found");
+        return null;
+    }
+
+
+
 }
