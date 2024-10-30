@@ -1,5 +1,6 @@
 package com.example.task_management.controller.admin;
 
+import com.example.task_management.dto.CommentDto;
 import com.example.task_management.dto.TaskDto;
 import com.example.task_management.service.admin.AdminService;
 import lombok.RequiredArgsConstructor;
@@ -54,5 +55,17 @@ public class AdminController {
     @GetMapping("/task/search/{title}")
     public ResponseEntity<List<TaskDto>> searchTask(@PathVariable String title){
         return ResponseEntity.ok(adminService.searchTaskByTitle(title));
+    }
+
+    @PostMapping("/task/comment/{taskId}")
+    public ResponseEntity<CommentDto> createComment(@PathVariable Long taskId, @RequestParam String content){
+        CommentDto createTaskDto = adminService.createComment(taskId,content);
+        if (createTaskDto == null) return  ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        return  ResponseEntity.status(HttpStatus.CREATED).body(createTaskDto);
+    }
+
+    @GetMapping("/comment/{taskId}")
+    public ResponseEntity<List<CommentDto>> getCommentByTaskId(@PathVariable Long taskId){
+        return ResponseEntity.ok(adminService.getCommentByTaskDto(taskId));
     }
 }

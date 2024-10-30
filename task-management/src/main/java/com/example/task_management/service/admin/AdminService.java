@@ -1,5 +1,6 @@
 package com.example.task_management.service.admin;
 
+import com.example.task_management.dto.CommentDto;
 import com.example.task_management.dto.TaskDto;
 import com.example.task_management.dto.UserDto;
 
@@ -19,4 +20,8 @@ public interface AdminService {
     TaskDto updateTask(Long id, TaskDto taskDto);
 
     List<TaskDto> searchTaskByTitle(String title);
+
+    CommentDto createComment(Long taskId, String content);
+
+    List<CommentDto> getCommentByTaskDto(Long taskId);
 }
