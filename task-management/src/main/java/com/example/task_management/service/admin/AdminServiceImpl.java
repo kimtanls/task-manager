@@ -52,7 +52,7 @@ public class AdminServiceImpl implements  AdminService{
             throw new IllegalArgumentException("Employee ID must not be null");
         }
         Optional<User> optionalUser = userRepository.findById(taskDto.getEmployeeId());
-        log.info(String.valueOf(taskDto.getEmployeeId()));
+
         if (optionalUser.isPresent()){
             Task task = new Task();
             task.setTitle(taskDto.getTitle());

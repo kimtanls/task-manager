@@ -1,15 +1,13 @@
 package com.example.task_management.controller.employee;
 
+import com.example.task_management.dto.CommentDto;
 import com.example.task_management.dto.TaskDto;
 import com.example.task_management.service.employee.EmployeeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -33,5 +31,22 @@ public class EmployeeController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         return ResponseEntity.ok(updateTaskDto);
+    }
+
+    @GetMapping("/task/{id}")
+    public  ResponseEntity<TaskDto> getTaskById(@PathVariable Long id){
+        return ResponseEntity.ok(employeeService.getTaskById(id));
+    }
+
+    @PostMapping("/task/comment/{taskId}")
+    public ResponseEntity<CommentDto> createComment(@PathVariable Long taskId, @RequestParam String content){
+        CommentDto createTaskDto = employeeService.createComment(taskId,content);
+        if (createTaskDto == null) return  ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        return  ResponseEntity.status(HttpStatus.CREATED).body(createTaskDto);
+    }
+
+    @GetMapping("/comment/{taskId}")
+    public ResponseEntity<List<CommentDto>> getCommentByTaskId(@PathVariable Long taskId){
+        return ResponseEntity.ok(employeeService.getCommentByTaskDto(taskId));
     }
 }
