@@ -32,6 +32,7 @@ public class Notification {
     @JsonIgnore
     private User user;
 
+
     public NotificationDto getNotificationDto(){
         NotificationDto notificationDto = new NotificationDto();
         notificationDto.setId(id);
@@ -44,4 +45,5 @@ public class Notification {
         notificationDto.setUserName(user.getName());
         return notificationDto;
     }
+
 }

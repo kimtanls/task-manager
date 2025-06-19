@@ -9,7 +9,6 @@ import java.util.Date;
 
 @Data
 public class TaskDto {
-
     private Long id;
 
     private String title;

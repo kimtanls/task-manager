@@ -1,9 +1,9 @@
 package com.example.task_management.config;
 
-import com.example.task_management.entity.User;
+
 import com.example.task_management.enums.UserRole;
 import com.example.task_management.service.jwt.UserService;
-import jakarta.servlet.http.HttpServletRequest;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

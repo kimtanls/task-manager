@@ -32,6 +32,12 @@ public class Comment {
     @JsonIgnore
     private Task task;
 
+    @OneToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "notification_id", nullable = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonIgnore
+    private Notification notification;
+
     public CommentDto getCommentDto(){
         CommentDto commentDto = new CommentDto();
         commentDto.setId(id);

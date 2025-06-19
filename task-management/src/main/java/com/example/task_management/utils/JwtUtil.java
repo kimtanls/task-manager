@@ -29,11 +29,12 @@ public class JwtUtil {
 
     @Autowired
     private UserRepository userRepository;
+
     public String generateToken(UserDetails userDetails){
         return  generateToken(new HashMap<>(), userDetails);
     }
 
-    private  String generateToken(HashMap<String, Objects> extraClaims, UserDetails userDetails) {
+    private String generateToken(HashMap<String, Objects> extraClaims, UserDetails userDetails) {
         return Jwts.builder()
                 .setClaims(extraClaims).
                 setSubject(userDetails.getUsername()) //thong tin nguoi dung

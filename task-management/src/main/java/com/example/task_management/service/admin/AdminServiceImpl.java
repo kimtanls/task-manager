@@ -4,11 +4,13 @@ import com.example.task_management.dto.CommentDto;
 import com.example.task_management.dto.TaskDto;
 import com.example.task_management.dto.UserDto;
 import com.example.task_management.entity.Comment;
+import com.example.task_management.entity.Notification;
 import com.example.task_management.entity.Task;
 import com.example.task_management.entity.User;
 import com.example.task_management.enums.TaskStatus;
 import com.example.task_management.enums.UserRole;
 import com.example.task_management.repository.CommentRepository;
+import com.example.task_management.repository.NotificationRepository;
 import com.example.task_management.repository.TaskRepository;
 import com.example.task_management.repository.UserRepository;
 import com.example.task_management.utils.JwtUtil;
@@ -33,6 +35,9 @@ public class AdminServiceImpl implements  AdminService{
 
     @Autowired
     private CommentRepository commentRepository;
+
+    @Autowired
+    private NotificationRepository notificationRepository;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -61,14 +66,25 @@ public class AdminServiceImpl implements  AdminService{
             task.setDueDate(taskDto.getDueDate());
             task.setTaskStatus(TaskStatus.INPROGRESS);
             task.setUser(optionalUser.get());
-            return taskRepository.save(task).getTaskDTO();
+            Task saveTask = taskRepository.save(task);
+
+            // Tạo đối tượng Notification
+            Notification notification = new Notification();
+            notification.setMessage("A new task has been assigned to you: " + task.getTitle());
+            notification.setStatus("UNREAD");
+            notification.setType("NEW_TASK");
+            notification.setTask(saveTask);
+            notification.setUser(optionalUser.get());
+
+            notificationRepository.save(notification);
+
+            return saveTask.getTaskDTO();
         }
         return null;
     }
 
     @Override
     public List<TaskDto> getAllTasks() {
-
         return taskRepository.findAll()
                 .stream()
                 .sorted(Comparator.comparing(Task::getDueDate).reversed())
@@ -99,7 +115,18 @@ public class AdminServiceImpl implements  AdminService{
             existingTask.setPriority(taskDto.getPriority());
             existingTask.setTaskStatus(mapStringToTaskStatus(String.valueOf(taskDto.getTaskStatus())));
             existingTask.setUser(optionalUser.get());
-            return taskRepository.save(existingTask).getTaskDTO();
+            Task saveTask =  taskRepository.save(existingTask);
+
+            Notification notification = new Notification();
+            notification.setMessage("Task \"" + optionalTask.get().getTitle() + "\" has been update " );
+            notification.setTask(existingTask);
+            notification.setUser(existingTask.getUser());
+            notification.setType("TASK_UPDATE");
+            notification.setStatus("UNREAD");
+
+            notificationRepository.save(notification);
+
+            return saveTask.getTaskDTO();
         }
         return null;
     }
@@ -112,19 +139,43 @@ public class AdminServiceImpl implements  AdminService{
                 .map(Task::getTaskDTO)
                 .collect(Collectors.toList());
     }
-
     @Override
     public CommentDto createComment(Long taskId, String content) {
-
         Optional<Task> optionalTask = taskRepository.findById(taskId);
         User user = jwtUtil.getLoggedInUser();
-        if (optionalTask.isPresent() && user != null){
+
+        if (optionalTask.isPresent() && user != null) {
+
+            Task task = optionalTask.get();
+            User employeeUser = task.getUser(); // Lấy employee liên quan đến công việc này
+
+            // Tạo comment mới
             Comment comment = new Comment();
             comment.setCreatedAt(new Date());
             comment.setContent(content);
             comment.setTask(optionalTask.get());
             comment.setUser(user);
-            return commentRepository.save(comment).getCommentDto();
+
+            // Lưu comment vào cơ sở dữ liệu trước
+            Comment savedComment = commentRepository.save(comment);
+
+            // Tạo thông báo
+            Notification notification = new Notification();
+            notification.setMessage("Admin comment on task \"" + optionalTask.get().getTitle() + "\": \"" + content + "\"");
+            notification.setTask(optionalTask.get()); // Gán task liên quan đến thông báo
+            notification.setUser(employeeUser);
+            notification.setStatus("UNREAD");
+
+
+            // Lưu thông báo vào cơ sở dữ liệu
+            notificationRepository.save(notification);
+
+            // Cập nhật comment để liên kết với notification (nếu cần)
+            savedComment.setNotification(notification);
+
+            commentRepository.save(savedComment); // Cập nhật comment với notification
+
+            return savedComment.getCommentDto(); // Trả về DTO của comment đã lưu
         }
         throw new EntityNotFoundException("User or task not found");
     }
@@ -140,7 +191,7 @@ public class AdminServiceImpl implements  AdminService{
     private TaskStatus mapStringToTaskStatus(String status){
         return switch (status){
             case "PENDING" -> TaskStatus.PENDING;
-            case "INPROGRESS" -> TaskStatus.INPROGRESS;
+            case "INPROGRESS" -> TaskStatus.INPROGRESS;  
             case "COMPLETED" -> TaskStatus.COMPLETED;
             case "DEFERRED" -> TaskStatus.DEFERRED;
             default ->  TaskStatus.CANCELLED;

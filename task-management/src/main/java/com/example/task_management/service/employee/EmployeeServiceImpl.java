@@ -65,9 +65,9 @@ public class EmployeeServiceImpl implements EmployeeService{
 
     @Override
     public CommentDto createComment(Long taskId, String content) {
-
         Optional<Task> optionalTask = taskRepository.findById(taskId);
         User user = jwtUtil.getLoggedInUser();
+
         if (optionalTask.isPresent() && user != null){
             Comment comment = new Comment();
             comment.setCreatedAt(new Date());

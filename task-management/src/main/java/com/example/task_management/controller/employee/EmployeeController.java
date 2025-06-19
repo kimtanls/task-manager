@@ -1,8 +1,10 @@
 package com.example.task_management.controller.employee;
 
 import com.example.task_management.dto.CommentDto;
+import com.example.task_management.dto.NotificationDto;
 import com.example.task_management.dto.TaskDto;
 import com.example.task_management.service.employee.EmployeeService;
+import com.example.task_management.service.notification.NotificationServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,6 +20,10 @@ public class EmployeeController {
 
     @Autowired
     private EmployeeService employeeService;
+
+    @Autowired
+    private NotificationServiceImpl notificationService;
+
     @GetMapping("/tasks")
     public ResponseEntity<List<TaskDto>> getTaskById(){
 
@@ -48,5 +54,10 @@ public class EmployeeController {
     @GetMapping("/comment/{taskId}")
     public ResponseEntity<List<CommentDto>> getCommentByTaskId(@PathVariable Long taskId){
         return ResponseEntity.ok(employeeService.getCommentByTaskDto(taskId));
+    }
+
+    @GetMapping("/notification/{userId}")
+    public ResponseEntity<List<NotificationDto>> getNotification(@PathVariable Long userId){
+        return ResponseEntity.ok(notificationService.getNotification(userId));
     }
 }
